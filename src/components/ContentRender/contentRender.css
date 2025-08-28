@@ -1,0 +1,140 @@
+.content-render {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  line-height: 1.6;
+  color: #333;
+  padding: 0 20px;
+  max-width: 800px;
+  margin: 20px auto;
+}
+
+.content-render.markdown-body {
+  background-color: transparent;
+  color: inherit;
+}
+
+.content-render-ol,
+.content-render-ul {
+  margin: 0 0 1rem 0;
+  padding-left: 2rem;
+}
+
+.content-render-ol {
+  list-style-type: decimal;
+}
+
+.content-render-ul {
+  list-style-type: disc;
+}
+
+.content-render-table-container {
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.content-render-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #d1d5db;
+}
+
+.content-render-th,
+.content-render-td {
+  border: 1px solid #d1d5db;
+  text-align: left;
+}
+
+.content-render-th {
+  background-color: #f3f4f6;
+  font-weight: 600;
+}
+
+.content-render-tr:hover {
+  background-color: #f9fafb;
+  transition: background-color 0.2s ease;
+}
+
+.content-render-task-list-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.content-render-checkbox {
+  margin-right: 0.5rem;
+  height: 1rem;
+  width: 1rem;
+  border-radius: 0.25rem;
+  border: 1px solid #d1d5db;
+  color: #2563eb;
+  background-color: #ffffff;
+}
+
+.content-render-typing-cursor {
+  margin-left: 0.25rem;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* KaTeX math formula styles */
+.content-render .katex-display {
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+.content-render .katex {
+  font-size: 1.1em;
+}
+
+.content-render .katex-display .katex {
+  font-size: 1.2em;
+}
+
+/* Mermaid chart styles */
+.content-render .mermaid-chart-container {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background-color: #fafafa;
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+  overflow: auto;
+}
+
+.content-render .mermaid-chart-container svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.content-render .mermaid-error {
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid #ff6b6b;
+  border-radius: 8px;
+  background-color: #ffe0e0;
+  color: #c92a2a;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+.content-render .mermaid-error pre {
+  margin: 0.5rem 0 0 0;
+  font-size: 0.85em;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Disabled dark mode support for Mermaid charts - always use light theme
+@media (prefers-color-scheme: dark) {
+  .content-render .mermaid-chart-container {
+    background-color: #2d3748;
+    border-color: #4a5568;
+  }
+}
+*/
