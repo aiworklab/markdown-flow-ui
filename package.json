@@ -3,6 +3,11 @@
   "bugs": {
     "url": "https://github.com/ai-shifu/markdown-flow-ui/issues"
   },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
   "dependencies": {
     "@codemirror/lang-markdown": "^6.3.3",
     "@codemirror/language-data": "^6.5.1",
@@ -52,6 +57,8 @@
     "@vitejs/plugin-react": "^4.7.0",
     "@vitest/browser": "^3.2.4",
     "@vitest/coverage-v8": "^3.2.4",
+    "commitizen": "^4.3.1",
+    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^9",
     "eslint-config-next": "15.3.5",
     "eslint-config-prettier": "^10.1.8",
@@ -110,6 +117,7 @@
     "//build": "next build",
     "build": "vite build",
     "build-storybook": "storybook build",
+    "commit": "cz",
     "dev": "next dev --turbopack",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
