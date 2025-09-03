@@ -124,7 +124,7 @@
     "build-storybook": "storybook build",
     "bump": "standard-version",
     "bump:major": "standard-version --release-as major",
-    "bump:minor": "standard-version --release-as minor", 
+    "bump:minor": "standard-version --release-as minor",
     "bump:patch": "standard-version --release-as patch",
     "bump:prerelease": "standard-version --prerelease",
     "changelog": "standard-version --dry-run",
@@ -146,5 +146,5 @@
     "version": "npm run changelog && git add CHANGELOG.md"
   },
   "types": "dist/index.d.ts",
-  "version": "0.1.0-alpha.26"
+  "version": "0.1.0"
 }
