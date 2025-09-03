@@ -2,8 +2,8 @@ name: Publish Package and Create Release
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
 
 jobs:
   test:
@@ -35,14 +35,68 @@ jobs:
       - name: Build Storybook
         run: npm run build-storybook
 
-  build:
+  version:
     runs-on: ubuntu-latest
     needs: test
+    if: "!contains(github.event.head_commit.message, 'chore(release)')"
+    outputs:
+      new_version: ${{ steps.version.outputs.new_version }}
+      has_changes: ${{ steps.version.outputs.has_changes }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Check for conventional commits since last release
+        id: check_commits
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$LAST_TAG" ]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            COMMITS=$(git log ${LAST_TAG}..HEAD --oneline --grep="^feat" --grep="^fix" --grep="^BREAKING CHANGE" --extended-regexp)
+            if [ -n "$COMMITS" ]; then
+              echo "has_changes=true" >> $GITHUB_OUTPUT
+            else
+              echo "has_changes=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - name: Bump version and create tag
+        id: version
+        if: steps.check_commits.outputs.has_changes == 'true'
+        run: |
+          npm run bump
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "has_changes=true" >> $GITHUB_OUTPUT
+          git push --follow-tags
+
+  build:
+    runs-on: ubuntu-latest
+    needs: version
+    if: needs.version.outputs.has_changes == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: v${{ needs.version.outputs.new_version }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -65,12 +119,13 @@ jobs:
 
   publish:
     runs-on: ubuntu-latest
-    needs: build
+    needs: [version, build]
+    if: needs.version.outputs.has_changes == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          ref: v${{ needs.version.outputs.new_version }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -88,21 +143,16 @@ jobs:
           name: dist
           path: dist/
 
-      - name: Get package info
-        id: package
-        run: |
-          echo "name=$(node -p "require('./package.json').name")" >> $GITHUB_OUTPUT
-          echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-
       - name: Check if version exists on npm
         id: check_version
         run: |
-          if npm view ${{ steps.package.outputs.name }}@${{ steps.package.outputs.version }} version 2>/dev/null; then
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          if npm view $PACKAGE_NAME@${{ needs.version.outputs.new_version }} version 2>/dev/null; then
             echo "exists=true" >> $GITHUB_OUTPUT
-            echo "Version ${{ steps.package.outputs.version }} already exists on npm"
+            echo "Version ${{ needs.version.outputs.new_version }} already exists on npm"
           else
             echo "exists=false" >> $GITHUB_OUTPUT
-            echo "Version ${{ steps.package.outputs.version }} does not exist on npm"
+            echo "Version ${{ needs.version.outputs.new_version }} does not exist on npm"
           fi
 
       - name: Publish to npm
@@ -113,42 +163,34 @@ jobs:
 
       - name: Skip publish if version exists
         if: steps.check_version.outputs.exists == 'true'
-        run: echo "Skipping npm publish - version ${{ steps.package.outputs.version }} already exists"
+        run: echo "Skipping npm publish - version ${{ needs.version.outputs.new_version }} already exists"
 
   release:
     runs-on: ubuntu-latest
-    needs: publish
+    needs: [version, publish]
+    if: needs.version.outputs.has_changes == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-
-      - name: Get package info
-        id: package
-        run: |
-          echo "name=$(node -p "require('./package.json').name")" >> $GITHUB_OUTPUT
-          echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-
-      - name: Extract tag name
-        id: tag
-        run: echo "tag_name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          ref: v${{ needs.version.outputs.new_version }}
 
       - name: Generate release notes from changelog
         id: changelog
         run: |
+          VERSION="${{ needs.version.outputs.new_version }}"
           if [ -f CHANGELOG.md ]; then
             # Extract the latest version section from CHANGELOG.md
-            VERSION_SECTION=$(sed -n "/## \[${{ steps.package.outputs.version }}\]/,/## \[/p" CHANGELOG.md | sed '$d')
+            VERSION_SECTION=$(sed -n "/## \[${VERSION}\]/,/## \[/p" CHANGELOG.md | sed '$d')
             if [ -n "$VERSION_SECTION" ]; then
               echo "release_notes<<EOF" >> $GITHUB_OUTPUT
               echo "$VERSION_SECTION" >> $GITHUB_OUTPUT
               echo "EOF" >> $GITHUB_OUTPUT
             else
-              echo "release_notes=Release ${{ steps.package.outputs.version }}" >> $GITHUB_OUTPUT
+              echo "release_notes=Release v$VERSION" >> $GITHUB_OUTPUT
             fi
           else
-            echo "release_notes=Release ${{ steps.package.outputs.version }}" >> $GITHUB_OUTPUT
+            echo "release_notes=Release v$VERSION" >> $GITHUB_OUTPUT
           fi
 
       - name: Create GitHub Release
@@ -156,38 +198,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.tag.outputs.tag_name }}
-          release_name: Release ${{ steps.package.outputs.version }}
+          tag_name: v${{ needs.version.outputs.new_version }}
+          release_name: Release v${{ needs.version.outputs.new_version }}
           body: |
             ## 📦 Package Information
-            - **Package**: [${{ steps.package.outputs.name }}](https://www.npmjs.com/package/${{ steps.package.outputs.name }})
-            - **Version**: ${{ steps.package.outputs.version }}
-            - **Installation**: `npm install ${{ steps.package.outputs.name }}@${{ steps.package.outputs.version }}`
-
+            - **Package**: [markdown-flow-ui](https://www.npmjs.com/package/markdown-flow-ui)
+            - **Version**: ${{ needs.version.outputs.new_version }}
+            - **Installation**: `npm install markdown-flow-ui@${{ needs.version.outputs.new_version }}`
+            
             ## 📝 Changes
             ${{ steps.changelog.outputs.release_notes }}
-
+            
             ## 🔗 Links
-            - [NPM Package](https://www.npmjs.com/package/${{ steps.package.outputs.name }}/v/${{ steps.package.outputs.version }})
+            - [NPM Package](https://www.npmjs.com/package/markdown-flow-ui/v/${{ needs.version.outputs.new_version }})
             - [Documentation](https://github.com/${{ github.repository }}#readme)
             - [Issues](https://github.com/${{ github.repository }}/issues)
           draft: false
-          prerelease: ${{ contains(steps.package.outputs.version, 'alpha') || contains(steps.package.outputs.version, 'beta') || contains(steps.package.outputs.version, 'rc') }}
-
-  notify:
-    runs-on: ubuntu-latest
-    needs: [publish, release]
-    if: always()
-    steps:
-      - name: Get package info
-        id: package
-        run: |
-          echo "name=$(node -p "require('./package.json').name")" >> $GITHUB_OUTPUT
-          echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-
-      - name: Publish status
-        run: |
-          echo "✅ Workflow completed!"
-          echo "📦 Package: ${{ steps.package.outputs.name }}@${{ steps.package.outputs.version }}"
-          echo "🏷️ Tag: ${GITHUB_REF#refs/tags/}"
-          echo "🔗 Release: https://github.com/${{ github.repository }}/releases/tag/${GITHUB_REF#refs/tags/}"
+          prerelease: ${{ contains(needs.version.outputs.new_version, 'alpha') || contains(needs.version.outputs.new_version, 'beta') || contains(needs.version.outputs.new_version, 'rc') }}
