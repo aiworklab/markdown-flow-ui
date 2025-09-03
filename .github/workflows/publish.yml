@@ -205,10 +205,10 @@ jobs:
             - **Package**: [markdown-flow-ui](https://www.npmjs.com/package/markdown-flow-ui)
             - **Version**: ${{ needs.version.outputs.new_version }}
             - **Installation**: `npm install markdown-flow-ui@${{ needs.version.outputs.new_version }}`
-            
+
             ## 📝 Changes
             ${{ steps.changelog.outputs.release_notes }}
-            
+
             ## 🔗 Links
             - [NPM Package](https://www.npmjs.com/package/markdown-flow-ui/v/${{ needs.version.outputs.new_version }})
             - [Documentation](https://github.com/${{ github.repository }}#readme)
