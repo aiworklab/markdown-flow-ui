@@ -69,8 +69,10 @@ const ContentRender: React.FC<ContentRenderProps> = ({
         tooltipMinLength={tooltipMinLength}
       />
     ),
-    code: (props) => {
-      const { inline, className, children, ...rest } = props as any;
+    code: (
+      props: React.ComponentPropsWithoutRef<"code"> & { inline?: boolean }
+    ) => {
+      const { inline, className, children, ...rest } = props;
       const match = /language-(\w+)/.exec(className || "");
       const language = match ? match[1] : "";
 
@@ -89,14 +91,14 @@ const ContentRender: React.FC<ContentRenderProps> = ({
         </code>
       );
     },
-    table: ({ node, ...props }) => (
+    table: ({ ...props }) => (
       <div className="content-render-table-container">
         <table className="content-render-table" {...props} />
       </div>
     ),
-    th: ({ node, ...props }) => <th className="content-render-th" {...props} />,
-    td: ({ node, ...props }) => <td className="content-render-td" {...props} />,
-    tr: ({ node, ...props }) => <tr className="content-render-tr" {...props} />,
+    th: ({ ...props }) => <th className="content-render-th" {...props} />,
+    td: ({ ...props }) => <td className="content-render-td" {...props} />,
+    tr: ({ ...props }) => <tr className="content-render-tr" {...props} />,
     li: ({ node, ...props }) => {
       const className = node?.properties?.className;
       const hasTaskListItem =
@@ -108,9 +110,9 @@ const ContentRender: React.FC<ContentRenderProps> = ({
       }
       return <li {...props} />;
     },
-    ol: ({ node, ...props }) => <ol className="content-render-ol" {...props} />,
-    ul: ({ node, ...props }) => <ul className="content-render-ul" {...props} />,
-    input: ({ node, ...props }) => {
+    ol: ({ ...props }) => <ol className="content-render-ol" {...props} />,
+    ul: ({ ...props }) => <ul className="content-render-ul" {...props} />,
+    input: ({ ...props }) => {
       if (props.type === "checkbox") {
         return (
           <input
@@ -129,7 +131,6 @@ const ContentRender: React.FC<ContentRenderProps> = ({
 
   useEffect(() => {
     if (isComplete && !hasCompleted.current) {
-      console.log("[ContentRender] Typing is complete, calling onTypeFinished");
       hasCompleted.current = true; // Mark as completed
       onTypeFinished?.(); // Call the passed callback
     }
