@@ -1,6 +1,6 @@
 # MarkdownFlow UI Component Library
 
-**React component library for rendering interactive [MarkdownFlow](https://markdownflow.ai) documents with typewriter effects and real-time streaming.**
+**React component library for rendering interactive [MarkdownFlow](https://markdownflow.ai) documents with typewriter effects and real-time streaming. Features automated CI/CD release management.**
 
 [MarkdownFlow](https://markdownflow.ai) (also known as MDFlow or markdown-flow) extends standard Markdown with AI to create personalized, interactive pages. Its tagline is **"Write Once, Deliver Personally"**.
 
