@@ -41,9 +41,9 @@
       "section": "Chores"
     }
   ],
-  "commitUrlFormat": "https://github.com/ai-shifu/markdown-flow-ui/commit/{{hash}}",
-  "compareUrlFormat": "https://github.com/ai-shifu/markdown-flow-ui/compare/{{previousTag}}...{{currentTag}}",
-  "issueUrlFormat": "https://github.com/ai-shifu/markdown-flow-ui/issues/{{id}}",
+  "commitUrlFormat": "https://github.com/aiworklab/markdown-flow-ui/commit/{{hash}}",
+  "compareUrlFormat": "https://github.com/aiworklab/markdown-flow-ui/compare/{{previousTag}}...{{currentTag}}",
+  "issueUrlFormat": "https://github.com/aiworklab/markdown-flow-ui/issues/{{id}}",
   "userUrlFormat": "https://github.com/{{user}}",
   "releaseCommitMessageFormat": "chore(release): {{currentTag}}",
   "skip": {
