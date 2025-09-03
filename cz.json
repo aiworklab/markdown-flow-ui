@@ -5,6 +5,30 @@
     "tag_format": "v$version",
     "update_changelog_on_bump": true,
     "version": "0.1.0-alpha.26",
-    "version_scheme": "semver"
+    "version_scheme": "semver",
+    "changelog_file": "CHANGELOG.md",
+    "changelog_increment_filename": "body.md",
+    "annotated_tag": true,
+    "gpg_sign": false,
+    "style": [
+      ["qmark", "fg:#ff9800 bold"],
+      ["question", "bold"],
+      ["answer", "fg:#ff9800 bold"],
+      ["pointer", "fg:#ff9800 bold"],
+      ["highlighted", "fg:#ff9800 bold"],
+      ["selected", "fg:#cc5454"],
+      ["separator", "fg:#cc5454"],
+      ["instruction", ""],
+      ["text", ""],
+      ["disabled", "fg:#858585 italic"]
+    ],
+    "template": "$version ($(date +'%Y-%m-%d'))\n\n### Features\n\n$features\n\n### Bug Fixes\n\n$bugfixes\n\n### Documentation\n\n$documentation\n\n### Performance\n\n$performance\n\n### Refactor\n\n$refactor\n\n### Tests\n\n$tests\n\n### Build\n\n$build\n\n### CI\n\n$ci\n\n### Chore\n\n$chore\n\n",
+    "extras": {
+      "all": {
+        "changelog_pattern": "^(feat|fix|refactor|perf|test|build|ci|chore|docs)(\\(.+\\))?(!)?:",
+        "changelog_format": "* **{scope}:** {subject}",
+        "changelog_meta": ["scope", "subject"]
+      }
+    }
   }
 }
