@@ -267,8 +267,6 @@ graph LR
 ```
 ````
 
-````
-
 ### Hooks
 
 #### useTypewriter
@@ -287,7 +285,7 @@ function useTypewriter(
   pause: () => void;
   reset: () => void;
 }
-````
+```
 
 **示例：**
 

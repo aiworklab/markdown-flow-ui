@@ -17,6 +17,11 @@ repos:
         args: ["--autofix", "--indent=2", "--no-ensure-ascii"]
         files: \.(json)$
         exclude: ^(pnpm-lock\.yaml|package-lock\.json)$
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.45.0
+    hooks:
+      - id: markdownlint
+        args: ["--fix"]
   - repo: https://github.com/commitizen-tools/commitizen
     rev: v4.8.3
     hooks:
@@ -29,7 +34,7 @@ repos:
         name: Prettier
         entry: prettier
         language: node
-        files: ^src/.*\.(js|jsx|ts|tsx|mjs|cjs|css|scss|md|json)$
+        files: ^src/.*\.(js|jsx|ts|tsx|mjs|cjs|css|scss|json)$
         args: ["--write"]
         additional_dependencies: ["prettier@^3.5.3"]
         pass_filenames: true
