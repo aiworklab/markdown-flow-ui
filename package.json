@@ -99,7 +99,7 @@
   "license": "MIT",
   "lint-staged": {
     "*.md": [
-      "markdownlint --fix"
+      "markdownlint --fix --ignore CHANGELOG.md"
     ],
     "src/**/*.{css,scss,json}": [
       "prettier --write"
